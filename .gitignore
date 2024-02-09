@@ -18,3 +18,4 @@
 
 # Fuzzcheck data for the facet indexing fuzz test
 milli/fuzz/update::facet::incremental::fuzz::fuzz/
+meilisearch/.DS_Store
