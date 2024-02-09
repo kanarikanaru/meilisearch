@@ -9,8 +9,6 @@ on:
     tags-ignore:
       - latest
   # Both `schedule` and `workflow_dispatch` build the nightly tag
-  schedule:
-    - cron: '0 23 * * *' # Every day at 11:00pm
   workflow_dispatch:
 
 jobs:
@@ -72,7 +70,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: getmeili/meilisearch
+          images: kanarikanaru/meilisearch
           # Prevent `latest` to be updated for each new tag pushed.
           # We need latest and `vX.Y` tags to only be pushed for the stable Meilisearch releases.
           flavor: latest=false
@@ -92,14 +90,3 @@ jobs:
             COMMIT_SHA=${{ github.sha }}
             COMMIT_DATE=${{ steps.build-metadata.outputs.date }}
             GIT_TAG=${{ github.ref_name }}
-
-      # /!\ Don't touch this without checking with Cloud team
-      - name: Send CI information to Cloud team
-        # Do not send if nightly build (i.e. 'schedule' or 'workflow_dispatch' event)
-        if: github.event_name == 'push'
-        uses: peter-evans/repository-dispatch@v3
-        with:
-          token: ${{ secrets.MEILI_BOT_GH_PAT }}
-          repository: meilisearch/meilisearch-cloud
-          event-type: cloud-docker-build
-          client-payload: '{ "meilisearch_version": "${{ github.ref_name }}", "stable": "${{ steps.check-tag-format.outputs.stable }}" }'
